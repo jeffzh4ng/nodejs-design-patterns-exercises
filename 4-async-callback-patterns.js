@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 
 const concatFiles = (dest, cb, ...srcFiles) => {
   const iterate = (index) => {
@@ -28,11 +29,30 @@ const copyFile = (src, dest, cb) => {
   });
 };
 
-concatFiles(
-  "c.txt",
-  () => {
-    console.log("done");
-  },
-  "a.txt",
-  "b.txt"
-);
+// concatFiles(
+//   "c.txt",
+//   () => {
+//     console.log("done");
+//   },
+//   "a.txt",
+//   "b.txt"
+// );
+
+const listNestedFiles = (dir = "./", cb) => {
+  fs.readdir(dir, { withFileTypes: true }, (err, files) => {
+    if (files === undefined) return;
+
+    console.log(`====${dir}====`);
+    const dirs = files.filter((f) => f.isDirectory);
+
+    for (const d of dirs) {
+      console.log(d.name);
+      listNestedFiles(path.join("./", d.name), cb);
+    }
+  });
+};
+
+listNestedFiles("./", (err) => {
+  if (err) console.log("error");
+  else console.log("done");
+});
