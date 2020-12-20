@@ -52,7 +52,37 @@ const listNestedFiles = (dir = "./", cb) => {
   });
 };
 
-listNestedFiles("./", (err) => {
-  if (err) console.log("error");
-  else console.log("done");
+// listNestedFiles("./", (err) => {
+//   if (err) console.log("error");
+//   else console.log("done");
+// });
+
+const recursiveFind = (dir = "./", keyword, cb) => {
+  fs.readdir(dir, { withFileTypes: true }, (err, dirents) => {
+    if (!dirents) return;
+
+    const files = dirents.filter((f) => f.isFile);
+    const dirs = dirents.filter((f) => f.isDirectory);
+
+    for (const f of files) {
+      findKeyword(f.name, keyword);
+    }
+
+    for (const d of dirs) {
+      recursiveFind(d.name, keyword, cb);
+    }
+  });
+};
+
+const findKeyword = (f, keyword) => {
+  fs.readFile(f, (err, data) => {
+    if (data) {
+      const parsedData = data.toString();
+      if (parsedData.includes(keyword)) console.log(f);
+    }
+  });
+};
+
+recursiveFind("./", "hello", () => {
+  console.log("done");
 });
